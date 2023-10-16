@@ -51,6 +51,7 @@ const fetchUsers = async () => {
     const sorgu = await fetch("http://localhost:3000/istifadeciler");
     const cavab = await sorgu.json();
     console.log(cavab);
+    istifadeciler = [...cavab]
     cavab.forEach((item, index, array) => {
       console.log(item);
       tbody.innerHTML += `
@@ -62,7 +63,7 @@ const fetchUsers = async () => {
                     <td>${item.unvan}</td>
                     <td>${item.nomre}</td>
                     <td>         
-                        <button  onclick='istifadeciDuzelt(${istifadeciler.id})'>Duzelt</button>
+                        <button  onclick='istifadeciDuzelt(${item.id})'>Duzelt</button>
                     </td>
                     <td>         
                         <button  onclick='istifadeciSil(${item.id})'>Sil</button>
@@ -90,3 +91,51 @@ const istifadeciSil = async (id) => {
     console.error(error);
   }
 };
+
+const istifadeciDuzelt = async (id) => {
+  console.log(id);
+  const tapilanIstifadeci = istifadeciler.find(item=> item.id == id);
+  if (tapilanIstifadeci) {
+    ad.value = tapilanIstifadeci.ad,
+    soyad.value=tapilanIstifadeci.soyad,
+    yas.value=tapilanIstifadeci.yas,
+    unvan.value=tapilanIstifadeci.unvan,
+    nomre.value=tapilanIstifadeci.nomre
+    document.getElementById('edit-user').setAttribute('istifadeci-id', tapilanIstifadeci.id)
+  }else{
+    alert('bele bir istifadeci yoxdur')
+  }
+};
+
+const istifadeciMelumatiniDeyis = async () => {
+  const deyisecekUser = document.getElementById('edit-user').getAttribute('istifadeci-id')
+  if (ad.value == "") {
+    alert('xanani doldurun')
+  }else{
+    try {
+      const req = await fetch(`http://localhost:3000/istifadeciler/${deyisecekUser}`, {
+        method: "PUT",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          ad: ad.value,
+          soyad: soyad.value,
+          yas: yas.value,
+          unvan: unvan.value,
+          nomre: nomre.value,
+        }),
+      });
+      if(req.ok){
+        alert("yeni istifadeci yarandi")
+      }
+      else{
+        
+      };
+    } catch (error) {
+      console.error(error);
+    }
+  }
+}
+
+document.getElementById('edit-user').addEventListener('click',istifadeciMelumatiniDeyis )
